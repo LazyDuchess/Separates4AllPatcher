@@ -16,6 +16,7 @@ namespace Separates4AllPatcher
         public Form1()
         {
             InitializeComponent();
+            MessageBox.Show("Please locate your No-CD Sims2EP9.exe");
             var fileResult = openFileDialog1.ShowDialog();
             if (fileResult == DialogResult.OK && File.Exists(openFileDialog1.FileName))
             {
