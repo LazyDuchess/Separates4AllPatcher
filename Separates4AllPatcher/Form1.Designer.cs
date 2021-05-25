@@ -34,7 +34,7 @@
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
-            this.openFileDialog1.Filter = "\"Executable files|*.exe|All files|*.*\"";
+            this.openFileDialog1.Filter = "Executable files|*.exe|All files|*.*";
             // 
             // Form1
             // 
