@@ -92,20 +92,28 @@ namespace Separates4AllPatcher
             var oldFunctionIndex = IndexOf(fileBytes, customFunction);
             if (oldFunctionIndex == -1)
             {
-                var codeCaveIndex = IndexOfCodeCave(fileBytes, 0x1FF3 - 0x1FB2);
-                if (codeCaveIndex == -1)
+                var qolBytes = new byte[] { fileBytes[0x186129], fileBytes[0x186129+1] };
+                if (qolBytes[0] == 0x74 && qolBytes[1] == 0x1B)
                 {
-                    MessageBox.Show("Game is already patched or an incompatible version. Make sure this is a No-CD Mansion and Garden exe.");
-                    return;
+                    MessageBox.Show("Detected old version, going to update.");
                 }
-                
-
-                byte[] mainCodeLookup = new byte[] { 0x89, 0x96, 0xD8, 0x00, 0x00, 0x00, 0x8B, 0x86, 0xD8, 0x00, 0x00, 0x00, 0x3B, 0xC1, 0x0F, 0x84, 0x28, 0x02, 0x00, 0x00, 0x8B, 0x4C, 0x24, 0x0C, 0x49, 0x0F, 0x84, 0x4A };
-                var mainCodeIndex = IndexOf(fileBytes, mainCodeLookup);
-                if (mainCodeIndex == -1)
+                else
                 {
-                    MessageBox.Show("Game is already patched or an incompatible version. Make sure this is a No-CD Mansion and Garden exe.");
-                    return;
+                    var codeCaveIndex = IndexOfCodeCave(fileBytes, 0x1FF3 - 0x1FB2);
+                    if (codeCaveIndex == -1)
+                    {
+                        MessageBox.Show("Game is already patched or an incompatible version. Make sure this is a No-CD Mansion and Garden exe.");
+                        return;
+                    }
+
+
+                    byte[] mainCodeLookup = new byte[] { 0x89, 0x96, 0xD8, 0x00, 0x00, 0x00, 0x8B, 0x86, 0xD8, 0x00, 0x00, 0x00, 0x3B, 0xC1, 0x0F, 0x84, 0x28, 0x02, 0x00, 0x00, 0x8B, 0x4C, 0x24, 0x0C, 0x49, 0x0F, 0x84, 0x4A };
+                    var mainCodeIndex = IndexOf(fileBytes, mainCodeLookup);
+                    if (mainCodeIndex == -1)
+                    {
+                        MessageBox.Show("Game is already patched or an incompatible version. Make sure this is a No-CD Mansion and Garden exe.");
+                        return;
+                    }
                 }
             }
             else
@@ -122,6 +130,9 @@ namespace Separates4AllPatcher
             var buyIds = new byte[] { 0x01, 0x00, 0xC7, 0xEC, 0x00, 0x00, 0xC7, 0xEC, 0x02, 0x00, 0xC7, 0xEC };
             var newFunction = new byte[] { 0xA1, 0xF3, 0x1F, 0x40, 0x00, 0x39, 0x46, 0x10, 0x0F, 0x84, 0xCD, 0xFF, 0x2E, 0x00, 0xA1, 0xF7, 0x1F, 0x40, 0x00, 0x39, 0x46, 0x10, 0x0F, 0x84, 0xBF, 0xFF, 0x2E, 0x00, 0xA1, 0xFB, 0x1F, 0x40, 0x00, 0x39, 0x46, 0x10, 0x0F, 0x84, 0xB1, 0xFF, 0x2E, 0x00, 0x89, 0x96, 0xD8, 0x00, 0x00, 0x00, 0xE9, 0xA6, 0xFF, 0x2E, 0x00 };
 
+            //Ver2.1
+            var jumpHookQOL = new byte[] { 0xEB, 0x1B };
+
             ReplaceBytes(fileBytes, newFunction, 0x204E);
             ReplaceBytes(fileBytes, buyIds, 0x1FF3);
 
@@ -130,6 +141,7 @@ namespace Separates4AllPatcher
             ReplaceBytes(fileBytes, bottomId, 0x1FEB);
             ReplaceBytes(fileBytes, topId, 0x1FE7);
             ReplaceBytes(fileBytes, outfitId, 0x1FEF);
+            ReplaceBytes(fileBytes, jumpHookQOL, 0x186129);
             try
             {
                 File.WriteAllBytes(exeFile, fileBytes);
